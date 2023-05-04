@@ -1,0 +1,87 @@
+{
+  "AWSTemplateFormatVersion": "2010-09-09",
+  "Description": "Scalable, highly available, multi-tiered website architecture with 2 public subnets, 2 private subnets, at least 2 EC2 instances, RDS, S3, and CloudFront",
+  "Parameters": {
+    "VpcCIDR": {
+      "Description": "CIDR block for the VPC",
+      "Type": "String",
+      "Default": "10.0.0.0/16"
+    },
+    "PublicSubnet1CIDR": {
+      "Description": "CIDR block for the first public subnet",
+      "Type": "String",
+      "Default": "10.0.1.0/24"
+    },
+    "PublicSubnet2CIDR": {
+      "Description": "CIDR block for the second public subnet",
+      "Type": "String",
+      "Default": "10.0.2.0/24"
+    },
+    "PrivateSubnet1CIDR": {
+      "Description": "CIDR block for the first private subnet",
+      "Type": "String",
+      "Default": "10.0.3.0/24"
+    },
+    "PrivateSubnet2CIDR": {
+      "Description": "CIDR block for the second private subnet",
+      "Type": "String",
+      "Default": "10.0.4.0/24"
+    },
+    "KeyName": {
+      "Description": "Name of the SSH key pair to use for EC2 instances",
+      "Type": "AWS::EC2::KeyPair::KeyName",
+      "ConstraintDescription": "must be the name of an existing EC2 key pair."
+    },
+    "InstanceType": {
+      "Description": "EC2 instance type",
+      "Type": "String",
+      "Default": "t2.micro",
+      "AllowedValues": [
+        "t2.micro",
+        "t2.small",
+        "t2.medium"
+      ],
+      "ConstraintDescription": "must be a valid EC2 instance type."
+    },
+    "DBName": {
+      "Description": "Name of the RDS database",
+      "Type": "String",
+      "Default": "mydatabase"
+    },
+    "DBUsername": {
+      "Description": "Username for the RDS database",
+      "Type": "String",
+      "Default": "admin"
+    },
+    "DBPassword": {
+      "Description": "Password for the RDS database",
+      "Type": "String",
+      "NoEcho": true,
+      "Default": "MyDBPassword123"
+    },
+    "DBInstanceType": {
+      "Description": "RDS instance type",
+      "Type": "String",
+      "Default": "db.t2.micro",
+      "AllowedValues": [
+        "db.t2.micro",
+        "db.t2.small",
+        "db.t2.medium"
+      ],
+      "ConstraintDescription": "must be a valid RDS instance type."
+    },
+    "S3BucketName": {
+      "Description": "Name of the S3 bucket",
+      "Type": "String",
+      "Default": "mybucket"
+    }
+  },
+  "Resources": {
+    "VPC": {
+      "Type": "AWS::EC2::VPC",
+      "Properties": {
+        "CidrBlock": { "Ref": "VpcCIDR" },
+        "EnableDnsSupport": true,
+        "EnableDnsHostnames": true,
+        "InstanceTenancy": "default",
+        "Tags

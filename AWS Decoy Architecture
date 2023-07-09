@@ -1,0 +1,82 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Resources:
+  DecoyS3Bucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: decoy-s3-bucket
+
+  DecoyDynamoDBTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: decoy-dynamodb-table
+      AttributeDefinitions:
+        - AttributeName: id
+          AttributeType: S
+      KeySchema:
+        - AttributeName: id
+          KeyType: HASH
+      ProvisionedThroughput:
+        ReadCapacityUnits: 5
+        WriteCapacityUnits: 5
+
+  CloudTrailTrail:
+    Type: AWS::CloudTrail::Trail
+    Properties:
+      TrailName: decoy-cloudtrail-trail
+      S3BucketName: !Ref DecoyS3Bucket
+      IsMultiRegionTrail: true
+      IncludeGlobalServiceEvents: true
+      EnableLogFileValidation: true
+      IsLogging: true
+      CloudWatchLogsLogGroupArn: <YOUR_CLOUDWATCH_LOG_GROUP_ARN>
+
+  CloudTrailEventSelector:
+    Type: AWS::CloudTrail::Trail
+    Properties:
+      TrailName: decoy-cloudtrail-trail
+      EventSelectors:
+        - DataResources:
+            - Type: AWS::S3::Object
+              Values:
+                - arn:aws:s3:::<YOUR_BUCKET_NAME>/*
+          IncludeManagementEvents: true
+          ReadWriteType: All
+          DataEvents:
+            - Name: GetObject
+              Type: Read
+            - Name: HeadObject
+              Type: Read
+
+        - DataResources:
+            - Type: AWS::DynamoDB::Table
+              Values:
+                - arn:aws:dynamodb:<REGION>:<ACCOUNT_ID>:table/decoy-dynamodb-table
+          IncludeManagementEvents: true
+          ReadWriteType: All
+          DataEvents:
+            - Name: BatchExecuteStatement
+              Type: Write
+            - Name: BatchGetItem
+              Type: Read
+            - Name: BatchWriteItem
+              Type: Write
+            - Name: DeleteItem
+              Type: Write
+            - Name: ExecuteStatement
+              Type: Write
+            - Name: ExecuteTransaction
+              Type: Write
+            - Name: GetItem
+              Type: Read
+            - Name: PutItem
+              Type: Write
+            - Name: Query
+              Type: Read
+            - Name: Scan
+              Type: Read
+            - Name: TransactGetItems
+              Type: Read
+            - Name: TransactWriteItems
+              Type: Write
+            - Name: UpdateItem
+              Type: Write
